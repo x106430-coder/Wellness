@@ -1,0 +1,13 @@
+package com.wellness.Repository;
+
+import com.wellness.Entiity.QuestionAnswer;
+import com.wellness.Entiity.QuestionCode;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+public interface WellnessRepository extends JpaRepository<QuestionAnswer, Long> {
+    Optional<QuestionAnswer> findByUserIdAndAnswerDateAndQuestionCode(
+            Long userId, LocalDate answerDate, QuestionCode questionCode);
+}
