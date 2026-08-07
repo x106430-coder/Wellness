@@ -31,6 +31,7 @@ public class AuthService {
 
         User user = new User(
                 request.loginId(),
+                request.nickname(),
                 encodedPassword,
                 LocalDateTime.now()
         );

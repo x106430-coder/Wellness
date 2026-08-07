@@ -37,6 +37,7 @@ public class AuthController {
         AuthResponse response = new AuthResponse(
                 user.getId(),
                 user.getLoginId(),
+                user.getNickname(),
                 accessToken,
                 "Bearer"
         );
@@ -58,6 +59,7 @@ public class AuthController {
         AuthResponse response = new AuthResponse(
                 user.getId(),
                 user.getLoginId(),
+                user.getNickname(),
                 accessToken,
                 "Bearer"
         );
