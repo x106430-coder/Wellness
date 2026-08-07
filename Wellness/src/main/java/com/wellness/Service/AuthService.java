@@ -2,7 +2,7 @@ package com.wellness.Service;
 
 import com.wellness.Dto.LoginRequest;
 import com.wellness.Dto.SignupRequest;
-import com.wellness.Entiity.User;
+import com.wellness.Entity.User;
 import com.wellness.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

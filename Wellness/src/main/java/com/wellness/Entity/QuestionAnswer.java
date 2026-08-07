@@ -1,4 +1,4 @@
-package com.wellness.Entiity;
+package com.wellness.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

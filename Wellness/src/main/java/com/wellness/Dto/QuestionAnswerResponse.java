@@ -1,7 +1,7 @@
 package com.wellness.Dto;
 
-import com.wellness.Entiity.QuestionAnswer;
-import com.wellness.Entiity.QuestionCode;
+import com.wellness.Entity.QuestionAnswer;
+import com.wellness.Entity.QuestionCode;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

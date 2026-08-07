@@ -1,5 +1,8 @@
 package com.wellness.Config;
 
+import com.wellness.Dto.AuthenticatedUser;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +20,8 @@ public class JwtProvider {
     private final long expirationMs;
 
     public JwtProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms}") long expirationMs
+            @Value("${jwt.secret:not-today-local-secret-key-2026-must-be-long-enough}") String secret,
+            @Value("${jwt.expiration-ms:86400000}") long expirationMs
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
@@ -35,5 +38,18 @@ public class JwtProvider {
                 .expiration(Date.from(now.plusMillis(expirationMs)))
                 .signWith(key)
                 .compact();
+    }
+
+    public AuthenticatedUser parse(String token) throws JwtException {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Long userId = Long.valueOf(claims.getSubject());
+        String loginId = claims.get("loginId", String.class);
+
+        return new AuthenticatedUser(userId, loginId);
     }
 }

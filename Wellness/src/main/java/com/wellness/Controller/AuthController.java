@@ -4,7 +4,7 @@ import com.wellness.Config.JwtProvider;
 import com.wellness.Dto.AuthResponse;
 import com.wellness.Dto.LoginRequest;
 import com.wellness.Dto.SignupRequest;
-import com.wellness.Entiity.User;
+import com.wellness.Entity.User;
 import com.wellness.Service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

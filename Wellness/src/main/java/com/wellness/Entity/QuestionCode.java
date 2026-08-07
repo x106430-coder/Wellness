@@ -1,4 +1,4 @@
-package com.wellness.Entiity;
+package com.wellness.Entity;
 
 public enum QuestionCode {
     LEAVE_WORK_TIME,
