@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class WellnessServiceTest {
 
     @Autowired
-    private WellnessService wellnessService;
+    private DiagnosisService diagnosisService;
 
     @Autowired
     private WellnessRepository wellnessRepository;
@@ -36,10 +36,10 @@ class WellnessServiceTest {
 
     @Test
     void sameQuestionSubmittedAgainOnSameDateUpdatesExistingRow() {
-        QuestionAnswerResponse first = wellnessService.saveOrUpdate(
-                1L, new QuestionAnswerRequest(QuestionCode.SLEEP_HOURS, "6", false));
-        QuestionAnswerResponse updated = wellnessService.saveOrUpdate(
-                1L, new QuestionAnswerRequest(QuestionCode.SLEEP_HOURS, "8", false));
+        QuestionAnswerResponse first = diagnosisService.saveOrUpdate(
+                1L, new QuestionAnswerRequest(QuestionCode.LAST_NIGHT_SLEEP, "6", null, false));
+        QuestionAnswerResponse updated = diagnosisService.saveOrUpdate(
+                1L, new QuestionAnswerRequest(QuestionCode.LAST_NIGHT_SLEEP, "8", null, false));
 
         assertThat(updated.id()).isEqualTo(first.id());
         assertThat(updated.answerValue()).isEqualTo("8");
@@ -48,23 +48,51 @@ class WellnessServiceTest {
 
     @Test
     void skippedAnswerIsSavedWithNullValue() {
-        QuestionAnswerResponse response = wellnessService.saveOrUpdate(
-                1L, new QuestionAnswerRequest(QuestionCode.FATIGUE_LEVEL, "ignored", true));
+        QuestionAnswerResponse response = diagnosisService.saveOrUpdate(
+                1L, new QuestionAnswerRequest(QuestionCode.TODAY_ENERGY, "ignored", null, true));
 
         assertThat(response.skipped()).isTrue();
         assertThat(response.answerValue()).isNull();
     }
 
     @Test
+    void sameWeeklyQuestionSubmittedAgainInSameWeekUpdatesExistingRow() {
+        QuestionAnswerResponse first = diagnosisService.saveOrUpdate(
+                1L, new QuestionAnswerRequest(QuestionCode.WATER_INTAKE, "1L", null, false));
+        QuestionAnswerResponse updated = diagnosisService.saveOrUpdate(
+                1L, new QuestionAnswerRequest(QuestionCode.WATER_INTAKE, "1_5L", null, false));
+
+        assertThat(updated.id()).isEqualTo(first.id());
+        assertThat(updated.answerValue()).isEqualTo("1_5L");
+        assertThat(wellnessRepository.count()).isEqualTo(1);
+    }
+
+    @Test
     void answerValueIsRequiredWhenNotSkipped() {
         QuestionAnswerRequest request = new QuestionAnswerRequest(
-                QuestionCode.AVAILABLE_TIME, null, false);
+                QuestionCode.CARE_AVAILABLE_TIME, null, null, false);
 
         Set<ConstraintViolation<QuestionAnswerRequest>> violations = validator.validate(request);
 
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
                 .contains("answerValue is required when skipped is false");
+    }
+
+    @Test
+    void multipleAnswersAreSerializedWhenMultiSelectQuestionIsSubmitted() {
+        QuestionAnswerResponse response = diagnosisService.saveOrUpdate(
+                1L,
+                new QuestionAnswerRequest(
+                        QuestionCode.TODAY_PLANNED_CARE,
+                        null,
+                        java.util.List.of("WORKOUT", "SKINCARE"),
+                        false
+                )
+        );
+
+        assertThat(response.answerValue()).isEqualTo("WORKOUT|SKINCARE");
+        assertThat(response.answerValues()).containsExactly("WORKOUT", "SKINCARE");
     }
 
     @TestConfiguration

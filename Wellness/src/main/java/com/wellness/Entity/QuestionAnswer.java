@@ -36,7 +36,7 @@ public class QuestionAnswer {
     private Long userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_code", nullable = false, length = 40)
+    @Column(name = "question_code", nullable = false, length = 80)
     private QuestionCode questionCode;
 
     @Column(name = "answer_value", length = 500)

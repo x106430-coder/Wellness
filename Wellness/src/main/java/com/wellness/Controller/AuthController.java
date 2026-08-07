@@ -31,13 +31,15 @@ public class AuthController {
 
         String accessToken = jwtProvider.createAccessToken(
                 user.getId(),
-                user.getLoginId()
+                user.getEmail()
         );
 
         AuthResponse response = new AuthResponse(
                 user.getId(),
-                user.getLoginId(),
+                user.getEmail(),
                 user.getNickname(),
+                user.getGender().name(),
+                user.getAge(),
                 accessToken,
                 "Bearer"
         );
@@ -53,13 +55,15 @@ public class AuthController {
 
         String accessToken = jwtProvider.createAccessToken(
                 user.getId(),
-                user.getLoginId()
+                user.getEmail()
         );
 
         AuthResponse response = new AuthResponse(
                 user.getId(),
-                user.getLoginId(),
+                user.getEmail(),
                 user.getNickname(),
+                user.getGender().name(),
+                user.getAge(),
                 accessToken,
                 "Bearer"
         );

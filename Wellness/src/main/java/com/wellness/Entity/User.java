@@ -2,6 +2,8 @@ package com.wellness.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,8 +20,8 @@ import java.time.LocalDateTime;
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(
-                name = "uk_user_login_id",
-                columnNames = "login_id"
+                name = "uk_user_email",
+                columnNames = "email"
         )
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,11 +31,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id", nullable = false, length = 50)
-    private String loginId;
+    @Column(nullable = false, length = 100)
+    private String email;
 
     @Column(nullable = false, length = 30)
     private String nickname;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Gender gender;
+
+    @Column(nullable = false)
+    private Integer age;
 
     @Column(nullable = false, length = 255)
     private String password;
@@ -41,9 +50,12 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public User(String loginId, String nickname, String password, LocalDateTime createdAt) {
-        this.loginId = loginId;
+    public User(String email, String nickname, Gender gender, Integer age,
+                String password, LocalDateTime createdAt) {
+        this.email = email;
         this.nickname = nickname;
+        this.gender = gender;
+        this.age = age;
         this.password = password;
         this.createdAt = createdAt;
     }

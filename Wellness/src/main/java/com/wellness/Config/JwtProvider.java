@@ -27,13 +27,13 @@ public class JwtProvider {
         this.expirationMs = expirationMs;
     }
 
-    public String createAccessToken(Long userId, String loginId) {
+    public String createAccessToken(Long userId, String email) {
 
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
-                .claim("loginId", loginId)
+                .claim("email", email)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(expirationMs)))
                 .signWith(key)
@@ -48,8 +48,8 @@ public class JwtProvider {
                 .getPayload();
 
         Long userId = Long.valueOf(claims.getSubject());
-        String loginId = claims.get("loginId", String.class);
+        String email = claims.get("email", String.class);
 
-        return new AuthenticatedUser(userId, loginId);
+        return new AuthenticatedUser(userId, email);
     }
 }
