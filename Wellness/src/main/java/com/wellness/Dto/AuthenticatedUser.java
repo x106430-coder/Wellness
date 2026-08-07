@@ -2,6 +2,6 @@ package com.wellness.Dto;
 
 public record AuthenticatedUser(
         Long userId,
-        String loginId
+        String email
 ) {
 }

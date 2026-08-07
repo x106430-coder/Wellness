@@ -4,10 +4,14 @@ import com.wellness.Entity.QuestionAnswer;
 import com.wellness.Entity.QuestionCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.time.LocalDate;
 import java.util.Optional;
 
 public interface WellnessRepository extends JpaRepository<QuestionAnswer, Long> {
     Optional<QuestionAnswer> findByUserIdAndAnswerDateAndQuestionCode(
             Long userId, LocalDate answerDate, QuestionCode questionCode);
+
+    long countByUserIdAndAnswerDateAndQuestionCodeIn(
+            Long userId, LocalDate answerDate, Collection<QuestionCode> questionCodes);
 }

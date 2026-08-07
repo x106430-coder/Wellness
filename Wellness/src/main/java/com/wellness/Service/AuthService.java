@@ -22,16 +22,18 @@ public class AuthService {
     @Transactional
     public User signup(SignupRequest request) {
 
-        if (userRepository.existsByLoginId(request.loginId())) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        if (userRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
         String encodedPassword =
                 passwordEncoder.encode(request.password());
 
         User user = new User(
-                request.loginId(),
+                request.email(),
                 request.nickname(),
+                request.gender(),
+                request.age(),
                 encodedPassword,
                 LocalDateTime.now()
         );
@@ -41,13 +43,13 @@ public class AuthService {
 
     public User login(LoginRequest request) {
 
-        User user = userRepository.findByLoginId(request.loginId())
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.")
+                        new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.")
                 );
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         return user;
