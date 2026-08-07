@@ -1,13 +1,11 @@
 package com.wellness.Dto;
 
-import com.wellness.Entiity.QuestionCode;
+import com.wellness.Entity.QuestionCode;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public record QuestionAnswerRequest(
-        @NotNull @Positive Long userId,
         @NotNull QuestionCode questionCode,
         @Size(max = 500) String answerValue,
         @NotNull Boolean skipped

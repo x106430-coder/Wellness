@@ -2,7 +2,7 @@ package com.wellness.Service;
 
 import com.wellness.Dto.QuestionAnswerRequest;
 import com.wellness.Dto.QuestionAnswerResponse;
-import com.wellness.Entiity.QuestionAnswer;
+import com.wellness.Entity.QuestionAnswer;
 import com.wellness.Repository.WellnessRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,17 +20,17 @@ public class WellnessService {
     private final Clock clock;
 
     @Transactional
-    public QuestionAnswerResponse saveOrUpdate(QuestionAnswerRequest request) {
+    public QuestionAnswerResponse saveOrUpdate(Long userId, QuestionAnswerRequest request) {
         LocalDate today = LocalDate.now(clock);
         LocalDateTime now = LocalDateTime.now(clock);
 
         QuestionAnswer answer = wellnessRepository
-                .findByUserIdAndAnswerDateAndQuestionCode(request.userId(), today, request.questionCode())
+                .findByUserIdAndAnswerDateAndQuestionCode(userId, today, request.questionCode())
                 .map(existing -> {
                     existing.update(request.answerValue(), request.skipped(), now);
                     return existing;
                 })
-                .orElseGet(() -> new QuestionAnswer(request.userId(), request.questionCode(),
+                .orElseGet(() -> new QuestionAnswer(userId, request.questionCode(),
                         request.answerValue(), request.skipped(), today, now));
 
         return QuestionAnswerResponse.from(wellnessRepository.save(answer));

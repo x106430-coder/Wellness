@@ -2,7 +2,7 @@ package com.wellness.Service;
 
 import com.wellness.Dto.QuestionAnswerRequest;
 import com.wellness.Dto.QuestionAnswerResponse;
-import com.wellness.Entiity.QuestionCode;
+import com.wellness.Entity.QuestionCode;
 import com.wellness.Repository.WellnessRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -37,9 +37,9 @@ class WellnessServiceTest {
     @Test
     void sameQuestionSubmittedAgainOnSameDateUpdatesExistingRow() {
         QuestionAnswerResponse first = wellnessService.saveOrUpdate(
-                new QuestionAnswerRequest(1L, QuestionCode.SLEEP_HOURS, "6", false));
+                1L, new QuestionAnswerRequest(QuestionCode.SLEEP_HOURS, "6", false));
         QuestionAnswerResponse updated = wellnessService.saveOrUpdate(
-                new QuestionAnswerRequest(1L, QuestionCode.SLEEP_HOURS, "8", false));
+                1L, new QuestionAnswerRequest(QuestionCode.SLEEP_HOURS, "8", false));
 
         assertThat(updated.id()).isEqualTo(first.id());
         assertThat(updated.answerValue()).isEqualTo("8");
@@ -49,7 +49,7 @@ class WellnessServiceTest {
     @Test
     void skippedAnswerIsSavedWithNullValue() {
         QuestionAnswerResponse response = wellnessService.saveOrUpdate(
-                new QuestionAnswerRequest(1L, QuestionCode.FATIGUE_LEVEL, "ignored", true));
+                1L, new QuestionAnswerRequest(QuestionCode.FATIGUE_LEVEL, "ignored", true));
 
         assertThat(response.skipped()).isTrue();
         assertThat(response.answerValue()).isNull();
@@ -58,7 +58,7 @@ class WellnessServiceTest {
     @Test
     void answerValueIsRequiredWhenNotSkipped() {
         QuestionAnswerRequest request = new QuestionAnswerRequest(
-                1L, QuestionCode.AVAILABLE_TIME, null, false);
+                QuestionCode.AVAILABLE_TIME, null, false);
 
         Set<ConstraintViolation<QuestionAnswerRequest>> violations = validator.validate(request);
 

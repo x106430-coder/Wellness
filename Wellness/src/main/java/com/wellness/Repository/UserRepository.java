@@ -1,6 +1,6 @@
 package com.wellness.Repository;
 
-import com.wellness.Entiity.User;
+import com.wellness.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

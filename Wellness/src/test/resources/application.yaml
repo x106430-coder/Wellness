@@ -7,3 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+jwt:
+  secret: test-secret-key-2026-must-be-long-enough-for-hmac
+  expiration-ms: 86400000

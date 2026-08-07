@@ -31,6 +31,12 @@ public class GlobalExceptionHandler {
                 "INVALID_REQUEST", "Malformed JSON or unsupported questionCode", Map.of(), LocalDateTime.now()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(
+                "INVALID_REQUEST", exception.getMessage(), Map.of(), LocalDateTime.now()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(

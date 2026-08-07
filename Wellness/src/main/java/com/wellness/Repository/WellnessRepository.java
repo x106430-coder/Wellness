@@ -1,7 +1,7 @@
 package com.wellness.Repository;
 
-import com.wellness.Entiity.QuestionAnswer;
-import com.wellness.Entiity.QuestionCode;
+import com.wellness.Entity.QuestionAnswer;
+import com.wellness.Entity.QuestionCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
