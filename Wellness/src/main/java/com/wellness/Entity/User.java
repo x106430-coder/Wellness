@@ -32,14 +32,18 @@ public class User {
     @Column(name = "login_id", nullable = false, length = 50)
     private String loginId;
 
+    @Column(nullable = false, length = 30)
+    private String nickname;
+
     @Column(nullable = false, length = 255)
     private String password;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public User(String loginId, String password, LocalDateTime createdAt) {
+    public User(String loginId, String nickname, String password, LocalDateTime createdAt) {
         this.loginId = loginId;
+        this.nickname = nickname;
         this.password = password;
         this.createdAt = createdAt;
     }
