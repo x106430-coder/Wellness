@@ -54,8 +54,14 @@ public class QuestionAnswer {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public QuestionAnswer(Long userId, QuestionCode questionCode, String answerValue,
-                          boolean skipped, LocalDate answerDate, LocalDateTime now) {
+    public QuestionAnswer(
+            Long userId,
+            QuestionCode questionCode,
+            String answerValue,
+            boolean skipped,
+            LocalDate answerDate,
+            LocalDateTime now
+    ) {
         this.userId = userId;
         this.questionCode = questionCode;
         this.answerDate = answerDate;
@@ -63,7 +69,11 @@ public class QuestionAnswer {
         update(answerValue, skipped, now);
     }
 
-    public void update(String answerValue, boolean skipped, LocalDateTime now) {
+    public void update(
+            String answerValue,
+            boolean skipped,
+            LocalDateTime now
+    ) {
         this.skipped = skipped;
         this.answerValue = skipped ? null : answerValue;
         this.updatedAt = now;

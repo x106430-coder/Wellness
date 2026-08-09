@@ -1,5 +1,7 @@
 package com.wellness.Dto;
 
+import java.util.List;
+
 public record HomeSummaryResponse(
         String nickname,
         int dailyAnsweredCount,
@@ -7,6 +9,7 @@ public record HomeSummaryResponse(
         int weeklyAnsweredCount,
         int totalWeeklyQuestions,
         boolean dailyDiagnosisReady,
-        boolean weeklyDiagnosisReady
+        boolean weeklyDiagnosisReady,
+        List<QuestionAnswerResponse> dailyAnswers
 ) {
 }
