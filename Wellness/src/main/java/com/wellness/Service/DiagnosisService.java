@@ -27,53 +27,119 @@ public class DiagnosisService {
 
     @Transactional(readOnly = true)
     public DiagnosisQuestionsResponse getOnboardingQuestions() {
-        return new DiagnosisQuestionsResponse("ONBOARDING", questionCatalogService.getOnboardingQuestions());
+        return new DiagnosisQuestionsResponse(
+                "ONBOARDING",
+                questionCatalogService.getOnboardingQuestions()
+        );
     }
 
     @Transactional(readOnly = true)
     public DiagnosisQuestionsResponse getDailyQuestions() {
-        return new DiagnosisQuestionsResponse("DAILY", questionCatalogService.getQuestionsByFrequency(QuestionFrequency.DAILY));
+        return new DiagnosisQuestionsResponse(
+                "DAILY",
+                questionCatalogService.getQuestionsByFrequency(QuestionFrequency.DAILY)
+        );
     }
 
     @Transactional(readOnly = true)
     public DiagnosisQuestionsResponse getWeeklyQuestions() {
-        return new DiagnosisQuestionsResponse("WEEKLY", questionCatalogService.getQuestionsByFrequency(QuestionFrequency.WEEKLY));
+        return new DiagnosisQuestionsResponse(
+                "WEEKLY",
+                questionCatalogService.getQuestionsByFrequency(QuestionFrequency.WEEKLY)
+        );
     }
 
     @Transactional
-    public QuestionAnswerResponse saveOrUpdate(Long userId, QuestionAnswerRequest request) {
+    public QuestionAnswerResponse saveOrUpdate(
+            Long userId,
+            QuestionAnswerRequest request
+    ) {
         LocalDate answerDate = resolveAnswerDate(request.questionCode());
         LocalDateTime now = LocalDateTime.now(clock);
 
         QuestionAnswer answer = wellnessRepository
-                .findByUserIdAndAnswerDateAndQuestionCode(userId, answerDate, request.questionCode())
+                .findByUserIdAndAnswerDateAndQuestionCode(
+                        userId,
+                        answerDate,
+                        request.questionCode()
+                )
                 .map(existing -> {
-                    existing.update(request.normalizedAnswerValue(), request.skipped(), now);
+                    existing.update(
+                            request.normalizedAnswerValue(),
+                            request.skipped(),
+                            now
+                    );
                     return existing;
                 })
-                .orElseGet(() -> new QuestionAnswer(userId, request.questionCode(),
-                        request.normalizedAnswerValue(), request.skipped(), answerDate, now));
+                .orElseGet(() -> new QuestionAnswer(
+                        userId,
+                        request.questionCode(),
+                        request.normalizedAnswerValue(),
+                        request.skipped(),
+                        answerDate,
+                        now
+                ));
 
-        return QuestionAnswerResponse.from(wellnessRepository.save(answer));
+        return QuestionAnswerResponse.from(
+                wellnessRepository.save(answer)
+        );
     }
 
     @Transactional(readOnly = true)
-    public int countAnsweredQuestions(Long userId, QuestionFrequency frequency) {
-        List<QuestionCode> codes = questionCatalogService.getCodesByFrequency(frequency);
+    public int countAnsweredQuestions(
+            Long userId,
+            QuestionFrequency frequency
+    ) {
+        List<QuestionCode> codes =
+                questionCatalogService.getCodesByFrequency(frequency);
+
         LocalDate answerDate = resolveAnswerDate(frequency);
 
-        return (int) wellnessRepository.countByUserIdAndAnswerDateAndQuestionCodeIn(userId, answerDate, codes);
+        return (int) wellnessRepository
+                .countByUserIdAndAnswerDateAndQuestionCodeIn(
+                        userId,
+                        answerDate,
+                        codes
+                );
+    }
+
+    // 홈에서 오늘의 진단 답변을 가져오기 위한 메서드
+    @Transactional(readOnly = true)
+    public List<QuestionAnswer> getTodayDailyAnswers(Long userId) {
+
+        List<QuestionCode> codes =
+                questionCatalogService.getCodesByFrequency(
+                        QuestionFrequency.DAILY
+                );
+
+        LocalDate answerDate =
+                resolveAnswerDate(QuestionFrequency.DAILY);
+
+        return wellnessRepository
+                .findByUserIdAndAnswerDateAndQuestionCodeIn(
+                        userId,
+                        answerDate,
+                        codes
+                );
     }
 
     private LocalDate resolveAnswerDate(QuestionCode questionCode) {
-        return resolveAnswerDate(questionCatalogService.getFrequency(questionCode));
+        return resolveAnswerDate(
+                questionCatalogService.getFrequency(questionCode)
+        );
     }
 
-    private LocalDate resolveAnswerDate(QuestionFrequency frequency) {
+    private LocalDate resolveAnswerDate(
+            QuestionFrequency frequency
+    ) {
         LocalDate today = LocalDate.now(clock);
 
         if (frequency == QuestionFrequency.WEEKLY) {
-            return today.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
+            return today.with(
+                    TemporalAdjusters.previousOrSame(
+                            java.time.DayOfWeek.MONDAY
+                    )
+            );
         }
 
         return today;
