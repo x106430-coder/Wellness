@@ -39,7 +39,7 @@ public class QuestionCatalogService {
                 QuestionFrequency.DAILY,
                 QuestionInputType.SINGLE_CHOICE,
                 false,
-                options("GOOD", "좋음", "DRY", "건조함", "SENSITIVE", "민감함", "ACNE", "여드름", "OILY", "피지 많음")
+                options("GOOD", "좋음", "DRY", "건조함", "OILY", "유분 많음", "ACNE", "트러블", "SENSITIVE", "민감함")
         );
         register(
                 QuestionCode.CARE_AVAILABLE_TIME,
@@ -47,7 +47,7 @@ public class QuestionCatalogService {
                 QuestionFrequency.DAILY,
                 QuestionInputType.SINGLE_CHOICE,
                 false,
-                options("TEN_MIN", "10분", "TWENTY_MIN", "20분", "THIRTY_MIN", "30분", "ONE_HOUR_PLUS", "1시간 이상")
+                options("NONE", "없음", "TEN_MIN", "10분", "THIRTY_MIN", "30분", "ONE_HOUR_PLUS", "1시간 이상")
         );
         register(
                 QuestionCode.TODAY_PLANNED_CARE,
@@ -68,7 +68,21 @@ public class QuestionCatalogService {
                 )
         );
         register(
-                QuestionCode.STRENGTH_TRAINING_FREQUENCY,
+                QuestionCode.HARDEST_MOMENT,
+                "오늘 가장 힘들었던 것은",
+                QuestionFrequency.DAILY,
+                QuestionInputType.SINGLE_CHOICE,
+                false,
+                options(
+                        "WORK_STUDY", "업무 / 학업",
+                        "RELATIONSHIP", "대인관계",
+                        "HEALTH", "건강",
+                        "EMOTION", "감정",
+                        "OTHER", "기타"
+                )
+        );
+        register(
+                QuestionCode.STRENGTH_TRAINING,
                 "근력운동 - 주 몇회",
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.SINGLE_CHOICE,
@@ -76,7 +90,7 @@ public class QuestionCatalogService {
                 frequencyOptions()
         );
         register(
-                QuestionCode.CARDIO_FREQUENCY,
+                QuestionCode.CARDIO,
                 "유산소 - 주 몇회",
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.SINGLE_CHOICE,
@@ -84,8 +98,8 @@ public class QuestionCatalogService {
                 frequencyOptions()
         );
         register(
-                QuestionCode.PILATES_FREQUENCY,
-                "필라테스 - 주 몇회",
+                QuestionCode.STRETCHING,
+                "스트레칭 - 주 몇회",
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.SINGLE_CHOICE,
                 false,
@@ -97,7 +111,7 @@ public class QuestionCatalogService {
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.MULTI_CHOICE,
                 true,
-                options("VITAMIN_D", "비타민 D", "VITAMIN_C", "비타민 C", "OMEGA_3", "오메가 3")
+                options("VITAMIN_D", "비타민 D", "VITAMIN_C", "비타민 C", "OMEGA_3", "오메가 3", "NONE", "먹지 않음")
         );
         register(
                 QuestionCode.WATER_INTAKE,
@@ -105,7 +119,7 @@ public class QuestionCatalogService {
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.SINGLE_CHOICE,
                 false,
-                options("500ML", "500mL", "1L", "1L", "1_5L", "1.5L")
+                options("UNDER_500ML", "500mL 미만", "500ML", "500mL", "1L", "1L", "1_5L_PLUS", "1.5L 이상")
         );
         register(
                 QuestionCode.SKIN_TYPE,
@@ -121,15 +135,15 @@ public class QuestionCatalogService {
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.MULTI_CHOICE,
                 true,
-                options("DRYNESS", "건조함", "ACNE", "여드름", "SENSITIVE", "민감", "SEBUM", "피지", "ELASTICITY", "탄력")
+                options("DRYNESS", "건조함", "ACNE", "여드름", "SENSITIVE", "민감함", "SEBUM", "피지", "PORES", "모공", "ELASTICITY", "탄력")
         );
         register(
-                QuestionCode.SKINCARE_VISIT_FREQUENCY,
+                QuestionCode.SKINCARE_FREQUENCY,
                 "피부관리 - 한달에 몇번",
                 QuestionFrequency.WEEKLY,
                 QuestionInputType.SINGLE_CHOICE,
                 false,
-                options("ZERO", "0회", "ONE", "1회", "TWO", "2회", "THREE_PLUS", "3회 이상")
+                options("ZERO", "0회", "MONTHLY_ONE", "월 1회", "MONTHLY_TWO_THREE", "월 2~3회", "WEEKLY_ONE_PLUS", "주 1회 이상")
         );
     }
 

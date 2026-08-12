@@ -33,7 +33,7 @@ public class AuthService {
                 request.email(),
                 request.nickname(),
                 request.gender(),
-                request.age(),
+                request.resolvedAge(),
                 encodedPassword,
                 LocalDateTime.now()
         );

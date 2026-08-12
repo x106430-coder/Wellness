@@ -28,4 +28,10 @@ public interface WellnessRepository extends JpaRepository<QuestionAnswer, Long> 
             LocalDate answerDate,
             Collection<QuestionCode> questionCodes
     );
+
+    List<QuestionAnswer> findByUserIdAndAnswerDateBetweenOrderByAnswerDateAsc(
+            Long userId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
 }

@@ -2,9 +2,11 @@ package com.wellness.Controller;
 
 import com.wellness.Dto.AuthenticatedUser;
 import com.wellness.Dto.DiagnosisQuestionsResponse;
+import com.wellness.Dto.DiagnosisAnalysisResponse;
 import com.wellness.Dto.QuestionAnswerRequest;
 import com.wellness.Dto.QuestionAnswerResponse;
 import com.wellness.Service.DiagnosisService;
+import com.wellness.Service.DiagnosisAnalysisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DiagnosisController {
 
     private final DiagnosisService diagnosisService;
+    private final DiagnosisAnalysisService diagnosisAnalysisService;
 
     @GetMapping("/diagnosis/questions/onboarding")
     public ResponseEntity<DiagnosisQuestionsResponse> getOnboardingQuestions() {
@@ -43,5 +46,12 @@ public class DiagnosisController {
             @Valid @RequestBody QuestionAnswerRequest request
     ) {
         return ResponseEntity.ok(diagnosisService.saveOrUpdate(authenticatedUser.userId(), request));
+    }
+
+    @PostMapping("/diagnosis/analysis")
+    public ResponseEntity<DiagnosisAnalysisResponse> analyze(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return ResponseEntity.ok(diagnosisAnalysisService.analyze(authenticatedUser.userId()));
     }
 }
