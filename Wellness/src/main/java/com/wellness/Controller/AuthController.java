@@ -40,6 +40,7 @@ public class AuthController {
                 user.getNickname(),
                 user.getGender().name(),
                 user.getAge(),
+                user.getSubscriptionPlan().name(),
                 accessToken,
                 "Bearer"
         );
@@ -64,6 +65,7 @@ public class AuthController {
                 user.getNickname(),
                 user.getGender().name(),
                 user.getAge(),
+                user.getSubscriptionPlan().name(),
                 accessToken,
                 "Bearer"
         );

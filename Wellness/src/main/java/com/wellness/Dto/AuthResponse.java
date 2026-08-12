@@ -6,6 +6,7 @@ public record AuthResponse(
         String nickname,
         String gender,
         Integer age,
+        String subscriptionPlan,
         String accessToken,
         String tokenType
 ) {

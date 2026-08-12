@@ -22,3 +22,9 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+openai:
+  enabled: ${OPENAI_ENABLED:false}
+  api-key: ${OPENAI_API_KEY:}
+  model: ${OPENAI_MODEL:gpt-5.6-sol}
+  api-url: ${OPENAI_API_URL:https://api.openai.com/v1/responses}

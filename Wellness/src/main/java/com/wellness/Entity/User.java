@@ -44,6 +44,10 @@ public class User {
     @Column(nullable = false)
     private Integer age;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscription_plan", nullable = false, length = 20)
+    private SubscriptionPlan subscriptionPlan = SubscriptionPlan.FREE;
+
     @Column(nullable = false, length = 255)
     private String password;
 
@@ -56,7 +60,15 @@ public class User {
         this.nickname = nickname;
         this.gender = gender;
         this.age = age;
+        this.subscriptionPlan = SubscriptionPlan.FREE;
         this.password = password;
         this.createdAt = createdAt;
+    }
+
+    public void changeSubscriptionPlan(SubscriptionPlan subscriptionPlan) {
+        if (subscriptionPlan == null) {
+            throw new IllegalArgumentException("구독 등급은 필수입니다.");
+        }
+        this.subscriptionPlan = subscriptionPlan;
     }
 }
