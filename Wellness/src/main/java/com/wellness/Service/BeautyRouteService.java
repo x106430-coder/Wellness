@@ -5,7 +5,9 @@ import com.wellness.Dto.BeautyRouteResponse;
 import com.wellness.Dto.BeautyRouteStepResponse;
 import com.wellness.Entity.User;
 import com.wellness.Repository.UserRepository;
+import com.wellness.Repository.DiagnosisAnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +21,21 @@ import java.util.List;
 public class BeautyRouteService {
 
     private final UserRepository userRepository;
+    private final DiagnosisAnalysisResultRepository diagnosisAnalysisResultRepository;
     private final Clock clock;
+
+    @Value("${beauty-route.require-daily-diagnosis:false}")
+    private boolean requireDailyDiagnosis;
 
     @Transactional(readOnly = true)
     public BeautyRouteResponse recommend(Long userId, BeautyRouteRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        if (requireDailyDiagnosis && diagnosisAnalysisResultRepository
+                .findByUserIdAndAnalysisDate(userId, LocalDate.now(clock))
+                .isEmpty()) {
+            throw new IllegalArgumentException("오늘의 진단을 먼저 완료해주세요.");
+        }
         List<BeautyRouteStepResponse> candidates = createCandidates(request);
         int totalMinutes = candidates.stream()
                 .mapToInt(BeautyRouteStepResponse::estimatedMinutes)

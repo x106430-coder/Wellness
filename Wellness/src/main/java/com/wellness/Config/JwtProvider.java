@@ -10,8 +10,11 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HexFormat;
+import java.util.UUID;
 
 @Component
 public class JwtProvider {
@@ -21,7 +24,7 @@ public class JwtProvider {
 
     public JwtProvider(
             @Value("${jwt.secret:not-today-local-secret-key-2026-must-be-long-enough}") String secret,
-            @Value("${jwt.expiration-ms:86400000}") long expirationMs
+            @Value("${jwt.expiration-ms:2592000000}") long expirationMs
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
@@ -33,6 +36,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .id(UUID.randomUUID().toString())
                 .claim("email", email)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(expirationMs)))
@@ -41,6 +45,10 @@ public class JwtProvider {
     }
 
     public AuthenticatedUser parse(String token) throws JwtException {
+        return parseToken(token).authenticatedUser();
+    }
+
+    public ParsedToken parseToken(String token) throws JwtException {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
@@ -50,6 +58,28 @@ public class JwtProvider {
         Long userId = Long.valueOf(claims.getSubject());
         String email = claims.get("email", String.class);
 
-        return new AuthenticatedUser(userId, email);
+        String tokenId = claims.getId() != null ? claims.getId() : fingerprint(token);
+        return new ParsedToken(
+                new AuthenticatedUser(userId, email),
+                tokenId,
+                claims.getExpiration().toInstant()
+        );
+    }
+
+    private String fingerprint(String token) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (Exception exception) {
+            throw new IllegalStateException("토큰 식별자를 생성하지 못했습니다.", exception);
+        }
+    }
+
+    public record ParsedToken(
+            AuthenticatedUser authenticatedUser,
+            String tokenId,
+            Instant expiresAt
+    ) {
     }
 }

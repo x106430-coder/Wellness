@@ -3,9 +3,12 @@ package com.wellness.Service;
 import com.wellness.Dto.DiagnosisQuestionsResponse;
 import com.wellness.Dto.QuestionAnswerRequest;
 import com.wellness.Dto.QuestionAnswerResponse;
+import com.wellness.Dto.QuestionAnswersResponse;
 import com.wellness.Entity.QuestionAnswer;
 import com.wellness.Entity.QuestionCode;
 import com.wellness.Entity.QuestionFrequency;
+import com.wellness.Repository.DiagnosisAnalysisResultRepository;
+import com.wellness.Repository.ProfileInsightRepository;
 import com.wellness.Repository.WellnessRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import java.util.List;
 public class DiagnosisService {
 
     private final WellnessRepository wellnessRepository;
+    private final DiagnosisAnalysisResultRepository diagnosisAnalysisResultRepository;
+    private final ProfileInsightRepository profileInsightRepository;
     private final QuestionCatalogService questionCatalogService;
     private final Clock clock;
 
@@ -80,8 +85,35 @@ public class DiagnosisService {
                         now
                 ));
 
-        return QuestionAnswerResponse.from(
+        QuestionAnswerResponse response = QuestionAnswerResponse.from(
                 wellnessRepository.save(answer)
+        );
+
+        diagnosisAnalysisResultRepository.deleteByUserIdAndAnalysisDate(
+                userId, LocalDate.now(clock));
+        profileInsightRepository.deleteByUserIdAndProfileDate(
+                userId, LocalDate.now(clock));
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public QuestionAnswersResponse getAnswers(Long userId, QuestionFrequency frequency) {
+        LocalDate answerDate = resolveAnswerDate(frequency);
+        List<QuestionCode> codes = questionCatalogService.getCodesByFrequency(frequency);
+        List<QuestionAnswerResponse> answers = wellnessRepository
+                .findByUserIdAndAnswerDateAndQuestionCodeIn(userId, answerDate, codes)
+                .stream()
+                .map(QuestionAnswerResponse::from)
+                .toList();
+        int totalQuestions = codes.size();
+
+        return new QuestionAnswersResponse(
+                frequency.name(),
+                answerDate,
+                answers.size(),
+                totalQuestions,
+                answers.size() == totalQuestions,
+                answers
         );
     }
 
@@ -101,6 +133,15 @@ public class DiagnosisService {
                         answerDate,
                         codes
                 );
+    }
+
+    @Transactional(readOnly = true)
+    public int countNonSkippedAnswers(Long userId, QuestionFrequency frequency) {
+        List<QuestionCode> codes = questionCatalogService.getCodesByFrequency(frequency);
+        LocalDate answerDate = resolveAnswerDate(frequency);
+        return (int) wellnessRepository
+                .countByUserIdAndAnswerDateAndQuestionCodeInAndSkippedFalse(
+                        userId, answerDate, codes);
     }
 
     // 홈에서 오늘의 진단 답변을 가져오기 위한 메서드

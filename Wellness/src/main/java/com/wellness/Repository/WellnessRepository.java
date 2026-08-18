@@ -23,6 +23,12 @@ public interface WellnessRepository extends JpaRepository<QuestionAnswer, Long> 
             Collection<QuestionCode> questionCodes
     );
 
+    long countByUserIdAndAnswerDateAndQuestionCodeInAndSkippedFalse(
+            Long userId,
+            LocalDate answerDate,
+            Collection<QuestionCode> questionCodes
+    );
+
     List<QuestionAnswer> findByUserIdAndAnswerDateAndQuestionCodeIn(
             Long userId,
             LocalDate answerDate,

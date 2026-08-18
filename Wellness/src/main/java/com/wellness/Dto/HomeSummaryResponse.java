@@ -10,6 +10,14 @@ public record HomeSummaryResponse(
         int totalWeeklyQuestions,
         boolean dailyDiagnosisReady,
         boolean weeklyDiagnosisReady,
-        List<QuestionAnswerResponse> dailyAnswers
+        List<QuestionAnswerResponse> dailyAnswers,
+        Integer energyScore,
+        String energyLevel,
+        String headline,
+        String summary,
+        List<DiagnosisRecommendationResponse> todos,
+        List<DiagnosisRecommendationResponse> avoidances,
+        String generatedBy,
+        DiagnosisAnalysisResponse analysis
 ) {
 }

@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import com.wellness.Repository.RevokedTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,9 +23,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtProvider jwtProvider;
+    private final RevokedTokenRepository revokedTokenRepository;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(
+            JwtProvider jwtProvider,
+            RevokedTokenRepository revokedTokenRepository
+    ) {
         this.jwtProvider = jwtProvider;
+        this.revokedTokenRepository = revokedTokenRepository;
     }
 
     @Override
@@ -39,7 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
             try {
-                AuthenticatedUser authenticatedUser = jwtProvider.parse(token);
+                JwtProvider.ParsedToken parsedToken = jwtProvider.parseToken(token);
+                if (revokedTokenRepository.existsByTokenId(parsedToken.tokenId())) {
+                    SecurityContextHolder.clearContext();
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+                AuthenticatedUser authenticatedUser = parsedToken.authenticatedUser();
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(authenticatedUser, null, List.of());
                 authentication.setDetails(

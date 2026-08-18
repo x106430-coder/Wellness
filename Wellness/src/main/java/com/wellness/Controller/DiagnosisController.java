@@ -5,6 +5,8 @@ import com.wellness.Dto.DiagnosisQuestionsResponse;
 import com.wellness.Dto.DiagnosisAnalysisResponse;
 import com.wellness.Dto.QuestionAnswerRequest;
 import com.wellness.Dto.QuestionAnswerResponse;
+import com.wellness.Dto.QuestionAnswersResponse;
+import com.wellness.Entity.QuestionFrequency;
 import com.wellness.Service.DiagnosisService;
 import com.wellness.Service.DiagnosisAnalysisService;
 import jakarta.validation.Valid;
@@ -40,6 +42,22 @@ public class DiagnosisController {
         return ResponseEntity.ok(diagnosisService.getWeeklyQuestions());
     }
 
+    @GetMapping("/diagnosis/answers/daily")
+    public ResponseEntity<QuestionAnswersResponse> getDailyAnswers(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return ResponseEntity.ok(diagnosisService.getAnswers(
+                authenticatedUser.userId(), QuestionFrequency.DAILY));
+    }
+
+    @GetMapping("/diagnosis/answers/weekly")
+    public ResponseEntity<QuestionAnswersResponse> getWeeklyAnswers(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return ResponseEntity.ok(diagnosisService.getAnswers(
+                authenticatedUser.userId(), QuestionFrequency.WEEKLY));
+    }
+
     @PostMapping({"/diagnosis/answers", "/question-answers"})
     public ResponseEntity<QuestionAnswerResponse> saveAnswer(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -53,5 +71,17 @@ public class DiagnosisController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         return ResponseEntity.ok(diagnosisAnalysisService.analyze(authenticatedUser.userId()));
+    }
+
+    @GetMapping("/diagnosis/analysis")
+    public ResponseEntity<DiagnosisAnalysisResponse> getTodayAnalysis(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        DiagnosisAnalysisResponse response = diagnosisAnalysisService
+                .getTodayAnalysis(authenticatedUser.userId());
+
+        return response == null
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(response);
     }
 }

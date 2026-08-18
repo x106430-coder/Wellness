@@ -33,6 +33,7 @@ public class ReportService {
     private final WellnessRepository wellnessRepository;
     private final UserRepository userRepository;
     private final EnergyScoreCalculator energyScoreCalculator;
+    private final AiCommentService aiCommentService;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -63,6 +64,18 @@ public class ReportService {
                 .count();
         int sufficientSleepDays = countSufficientSleepDays(answers);
         List<ReportManagementRankResponse> ranking = managementRanking(answers);
+        String fallbackInsight = createInsight(average, change, sufficientSleepDays, chart.size());
+        Map<String, Object> reportData = new LinkedHashMap<>();
+        reportData.put("period", period.name());
+        reportData.put("averageEnergyScore", average);
+        reportData.put("previousPeriodAverageEnergyScore", previousAverage);
+        reportData.put("changeFromPreviousPeriod", change);
+        reportData.put("recoveryDays", recoveryDays);
+        reportData.put("sufficientSleepDays", sufficientSleepDays);
+        reportData.put("measuredDays", chart.size());
+        reportData.put("managementRanking", ranking);
+        AiCommentService.AiCommentResult insight =
+                aiCommentService.createReportInsight(reportData, fallbackInsight);
 
         return new WellnessReportResponse(
                 period,
@@ -77,7 +90,7 @@ public class ReportService {
                 recoveryDays,
                 sufficientSleepDays,
                 chart,
-                createInsight(average, change, sufficientSleepDays, chart.size()),
+                insight.comment(),
                 ranking
         );
     }

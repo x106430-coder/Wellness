@@ -1,5 +1,6 @@
 package com.wellness.Service;
 
+import com.wellness.Dto.DiagnosisAnalysisResponse;
 import com.wellness.Dto.HomeSummaryResponse;
 import com.wellness.Dto.QuestionAnswerResponse;
 import com.wellness.Entity.QuestionAnswer;
@@ -17,18 +18,21 @@ public class HomeService {
     private final UserRepository userRepository;
     private final DiagnosisService diagnosisService;
     private final QuestionCatalogService questionCatalogService;
+    private final DiagnosisAnalysisService diagnosisAnalysisService;
 
     public HomeService(
             UserRepository userRepository,
             DiagnosisService diagnosisService,
-            QuestionCatalogService questionCatalogService
+            QuestionCatalogService questionCatalogService,
+            DiagnosisAnalysisService diagnosisAnalysisService
     ) {
         this.userRepository = userRepository;
         this.diagnosisService = diagnosisService;
         this.questionCatalogService = questionCatalogService;
+        this.diagnosisAnalysisService = diagnosisAnalysisService;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public HomeSummaryResponse getHomeSummary(Long userId) {
 
         User user = userRepository.findById(userId)
@@ -58,6 +62,12 @@ public class HomeService {
                         QuestionFrequency.WEEKLY
                 );
 
+        int dailyNonSkippedAnswerCount =
+                diagnosisService.countNonSkippedAnswers(
+                        userId,
+                        QuestionFrequency.DAILY
+                );
+
         // 오늘 진단에서 저장된 답변 가져오기
         List<QuestionAnswer> todayAnswers =
                 diagnosisService.getTodayDailyAnswers(userId);
@@ -68,15 +78,32 @@ public class HomeService {
                         .map(QuestionAnswerResponse::from)
                         .toList();
 
+        boolean dailyAnswersIncomplete = dailyAnsweredCount < totalDailyQuestions
+                || dailyNonSkippedAnswerCount == 0;
+        // 홈 조회는 저장된 오늘 분석만 읽습니다. 분석 생성과 OpenAI 호출은
+        // 사용자가 오늘의 진단에서 "AI 분석하기"를 눌렀을 때만 수행합니다.
+        DiagnosisAnalysisResponse analysis = dailyAnswersIncomplete
+                ? null
+                : diagnosisAnalysisService.getTodayAnalysis(userId);
+        boolean dailyDiagnosisRequired = dailyAnswersIncomplete || analysis == null;
+
         return new HomeSummaryResponse(
                 user.getNickname(),
                 dailyAnsweredCount,
                 totalDailyQuestions,
                 weeklyAnsweredCount,
                 totalWeeklyQuestions,
-                dailyAnsweredCount < totalDailyQuestions,
+                dailyDiagnosisRequired,
                 weeklyAnsweredCount < totalWeeklyQuestions,
-                dailyAnswers
+                dailyAnswers,
+                analysis == null ? null : analysis.energyScore(),
+                analysis == null ? null : analysis.energyLevel(),
+                analysis == null ? null : analysis.headline(),
+                analysis == null ? null : analysis.summary(),
+                analysis == null ? List.of() : analysis.todos(),
+                analysis == null ? List.of() : analysis.avoidances(),
+                analysis == null ? null : analysis.generatedBy(),
+                analysis
         );
     }
 }
